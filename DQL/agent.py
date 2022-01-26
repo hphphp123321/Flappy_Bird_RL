@@ -17,14 +17,14 @@ class Agent():
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.model, self.modelT = self.init_netWork()
         self.batch_size = 128
-        self.memory = deque(maxlen=50000)
+        self.memory = deque(maxlen=500000)
         self.greedy = 1
         self.action_set = action_set
         self.mse = nn.MSELoss()
         self.lr_rate = 3e-4
         self.optimizer = optim.Adam(params=self.model.parameters(), lr=self.lr_rate)
         self.train_step = 0
-        self.update_time = 500
+        self.update_time = 1000
         
 
     def get_state(self, state):
@@ -33,32 +33,32 @@ class Agent():
         :param state: 游戏state
         :return: 返回提取好的数据
         """
-        return_state = np.zeros((3,))
-        dist_to_pipe_horz = state["next_pipe_dist_to_player"]
-        dist_to_pipe_bottom = state["player_y"] - state["next_pipe_top_y"]
-        velocity = state['player_vel']
-        return_state[0] = dist_to_pipe_horz
-        return_state[1] = dist_to_pipe_bottom
-        return_state[2] = velocity
+        # return_state = np.zeros((3,))
+        # dist_to_pipe_horz = state["next_pipe_dist_to_player"]
+        # dist_to_pipe_bottom = state["player_y"] - state["next_pipe_top_y"]
+        # velocity = state['player_vel']
+        # return_state[0] = dist_to_pipe_horz
+        # return_state[1] = dist_to_pipe_bottom
+        # return_state[2] = velocity
 
-        # return_state = np.zeros((8,))
-        # player_y = state["player_y"]
-        # player_vel = state["player_vel"]
-        # next_pipe_dist_to_player = state["next_pipe_dist_to_player"]
-        # next_pipe_top_y = state["next_pipe_top_y"]
-        # next_pipe_bottom_y = state["next_pipe_bottom_y"]
-        # next_next_pipe_dist_to_player = state["next_next_pipe_dist_to_player"]
-        # next_next_pipe_top_y = state["next_next_pipe_top_y"]
-        # next_next_pipe_bottom_y = state["next_next_pipe_bottom_y"]
+        return_state = np.zeros((8,))
+        player_y = state["player_y"]
+        player_vel = state["player_vel"]
+        next_pipe_dist_to_player = state["next_pipe_dist_to_player"]
+        next_pipe_top_y = state["next_pipe_top_y"]
+        next_pipe_bottom_y = state["next_pipe_bottom_y"]
+        next_next_pipe_dist_to_player = state["next_next_pipe_dist_to_player"]
+        next_next_pipe_top_y = state["next_next_pipe_top_y"]
+        next_next_pipe_bottom_y = state["next_next_pipe_bottom_y"]
 
-        # return_state[0] = player_y
-        # return_state[1] = player_vel
-        # return_state[2] = next_pipe_dist_to_player
-        # return_state[3] = next_pipe_top_y
-        # return_state[4] = next_pipe_bottom_y
-        # return_state[5] = next_next_pipe_dist_to_player
-        # return_state[6] = next_next_pipe_top_y
-        # return_state[7] = next_next_pipe_bottom_y
+        return_state[0] = player_y
+        return_state[1] = player_vel
+        return_state[2] = next_pipe_dist_to_player
+        return_state[3] = next_pipe_top_y
+        return_state[4] = next_pipe_bottom_y
+        return_state[5] = next_next_pipe_dist_to_player
+        return_state[6] = next_next_pipe_top_y
+        return_state[7] = next_next_pipe_bottom_y
         return return_state
 
     def init_netWork(self):
@@ -125,7 +125,7 @@ class Agent():
         self.memory.append(sample)
 
     def update_greedy(self):
-        if self.greedy > 0.005:
+        if self.greedy > 0.001:
             self.greedy *= 0.995
 
     def get_best_action(self, state):

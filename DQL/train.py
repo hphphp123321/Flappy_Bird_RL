@@ -6,7 +6,8 @@ from ple.games import FlappyBird
 from agent import Agent
 import torch
 import random
-
+import os
+os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 
 
@@ -22,7 +23,6 @@ if __name__ == "__main__":
     # 实例化Agent，将动作集传进去
     agent = Agent(p.getActionSet())
     max_score = 0
-    scores = deque(maxlen=10)
 
     for epoch in range(epochs):
         # 重置游戏
@@ -34,7 +34,7 @@ if __name__ == "__main__":
         step = 0
         current_score = 0
         rand = random.randint(5, 20)
-        if epoch % 9999 == 0:
+        if epoch % 999 == 1:
             agent.lr_rate *= 0.1
         while True:
             # 获得最佳动作
@@ -60,11 +60,10 @@ if __name__ == "__main__":
                 # 获得当前分数
                 # current_score = p.score()
                 max_score = max(max_score, current_score)
-                scores.append(current_score)
                 print('第%s次游戏，得分为: %s,最大得分为: %s' % (epoch, current_score, max_score))
-                if len(scores) == 10 and np.mean(scores) > 150:
+                if current_score >= 500:
                     state = {'net':agent.model.state_dict(), 'optimizer':agent.optimizer.state_dict(), 'epoch':epoch}
-                    torch.save(state, f'./model/{epoch}.pth')
-                    exit(0)
+                    torch.save(state, f'./model/{epoch}_{current_score}.pth')
+                    # exit(0)
                 break
 
