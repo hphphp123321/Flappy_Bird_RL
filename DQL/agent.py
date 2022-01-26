@@ -66,8 +66,8 @@ class Agent():
         构建模型
         :return:
         """
-        model1 = Net(in_dim=3, out_dim=2)
-        model2 = Net(in_dim=3, out_dim=2)
+        model1 = Net(in_dim=8, out_dim=2)
+        model2 = Net(in_dim=8, out_dim=2)
         # model = torch.nn.DataParallel(model, device_ids=[0, 1, 2])
         return model1.to(device=self.device), model2.to(device=self.device)
 
