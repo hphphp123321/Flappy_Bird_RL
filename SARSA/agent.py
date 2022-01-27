@@ -17,7 +17,6 @@ class Agent():
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.model, self.modelT = self.init_netWork()
         self.batch_size = 128
-        self.memory = deque(maxlen=50000)
         self.greedy = 1
         self.action_set = action_set
         self.mse = nn.MSELoss()
@@ -71,17 +70,13 @@ class Agent():
         # model = torch.nn.DataParallel(model, device_ids=[0, 1, 2])
         return model1.to(device=self.device), model2.to(device=self.device)
 
-    def train_model(self):
-        if len(self.memory) < 2500:
-            return
-
-        # print(f"len of memory:{len(self.memory)}")
-        train_sample = random.sample(self.memory, k=self.batch_size)
+    def train_model(self, E):
+        train_sample = E
         train_states = []
         next_states = []
 
         for sample in train_sample:
-            cur_state, action, r, next_state, done = sample
+            cur_state, action, r, next_state, next_action, done = sample
             # print(f"current_state:{cur_state}, action:{action}, r:{r}, next_state:{next_state}, done:{done}")
             next_states.append(next_state)
             train_states.append(cur_state)
@@ -95,6 +90,7 @@ class Agent():
         self.optimizer.zero_grad()
         # 得到下一个state的q值
         next_state_qT = self.modelT(next_states)
+        next_state_q = self.model(next_state)
         # print(f"next:{next_states_q}")
         # 得到预测值
         old_state_q = self.model(train_states)
@@ -105,7 +101,7 @@ class Agent():
             cur_state, action, r, next_state, done = sample
             # 计算Q现实
             if not done:
-                state_q[index][action] = r + self.gamma * torch.max(next_state_qT[index])
+                state_q[index][action] = r + self.gamma * next_state_qT[index][next_action]
             else:
                 state_q[index][action] = r
 
@@ -119,10 +115,6 @@ class Agent():
         if self.train_step % self.update_time == 0:
             self.modelT.load_state_dict(self.model.state_dict())
         self.train_step += 1
-
-
-    def add_memory(self, sample):
-        self.memory.append(sample)
 
     def update_greedy(self):
         if self.greedy > 0.001:

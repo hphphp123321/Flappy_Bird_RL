@@ -94,7 +94,8 @@ class Agent():
 
         self.optimizer.zero_grad()
         # 得到下一个state的q值
-        next_states_q = self.modelT(next_states)
+        next_state_qT = self.modelT(next_states)
+        next_state_q = self.model(next_state)
         # print(f"next:{next_states_q}")
         # 得到预测值
         old_state_q = self.model(train_states)
@@ -105,7 +106,7 @@ class Agent():
             cur_state, action, r, next_state, done = sample
             # 计算Q现实
             if not done:
-                state_q[index][action] = r + self.gamma * torch.max(next_states_q[index])
+                state_q[index][action] = r + self.gamma * next_state_qT[index][torch.argmax(next_state_q[index])]
             else:
                 state_q[index][action] = r
 
