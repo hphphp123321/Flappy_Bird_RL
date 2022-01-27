@@ -6,8 +6,8 @@ from ple.games import FlappyBird
 from agent import Agent
 import torch
 import random
-import os
-os.environ["SDL_VIDEODRIVER"] = "dummy"
+# import os
+# os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 
 

@@ -95,7 +95,7 @@ class Agent():
         self.optimizer.zero_grad()
         # 得到下一个state的q值
         next_state_qT = self.modelT(next_states)
-        next_state_q = self.model(next_state)
+        next_state_q = self.model(next_states)
         # print(f"next:{next_states_q}")
         # 得到预测值
         old_state_q = self.model(train_states)

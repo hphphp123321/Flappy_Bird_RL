@@ -6,8 +6,8 @@ from ple.games import FlappyBird
 from agent import Agent
 import torch
 import random
-import os
-os.environ["SDL_VIDEODRIVER"] = "dummy"
+# import os
+# os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 
 
@@ -29,7 +29,7 @@ if __name__ == "__main__":
         p.reset_game()
         # 获得状态
         state = agent.get_state(game.getGameState())
-        if epoch > 250:
+        if epoch > 150:
             agent.update_greedy()
         step = 0
         current_score = 0

@@ -16,7 +16,6 @@ class Agent():
         self.gamma = 0.999
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.model, self.modelT = self.init_netWork()
-        self.batch_size = 128
         self.greedy = 1
         self.action_set = action_set
         self.mse = nn.MSELoss()
@@ -71,39 +70,31 @@ class Agent():
         return model1.to(device=self.device), model2.to(device=self.device)
 
     def train_model(self, E):
-        train_sample = E
-        train_states = []
-        next_states = []
 
-        for sample in train_sample:
-            cur_state, action, r, next_state, next_action, done = sample
-            # print(f"current_state:{cur_state}, action:{action}, r:{r}, next_state:{next_state}, done:{done}")
-            next_states.append(next_state)
-            train_states.append(cur_state)
+        cur_state, action, r, next_state, next_action, done = E[0]
+        # print(f"current_state:{cur_state}, action:{action}, r:{r}, next_state:{next_state}, done:{done}")
+
         # 转成np数组
-        next_states = np.array(next_states)
-        train_states = np.array(train_states)
+        next_state = np.array(next_state)
+        cur_state = np.array(cur_state)
 
-        next_states = torch.tensor(next_states, dtype=torch.float32).to(self.device)
-        train_states = torch.tensor(train_states, dtype=torch.float32).to(self.device)
+        next_state = torch.tensor(next_state, dtype=torch.float32).to(self.device)
+        cur_state = torch.tensor(cur_state, dtype=torch.float32).to(self.device)
 
         self.optimizer.zero_grad()
         # 得到下一个state的q值
-        next_state_qT = self.modelT(next_states)
-        next_state_q = self.model(next_state)
-        # print(f"next:{next_states_q}")
+        next_state_qT = self.modelT(next_state)
+        # print(f"next:{next_state_qT}")
         # 得到预测值
-        old_state_q = self.model(train_states)
+        old_state_q = self.model(cur_state)
 
         state_q = old_state_q.clone()
         
-        for index, sample in enumerate(train_sample):
-            cur_state, action, r, next_state, done = sample
-            # 计算Q现实
-            if not done:
-                state_q[index][action] = r + self.gamma * next_state_qT[index][next_action]
-            else:
-                state_q[index][action] = r
+        # 计算Q现实
+        if not done:
+            state_q[action] = r + self.gamma * next_state_qT[next_action]
+        else:
+            state_q[action] = r
 
         loss = self.mse(old_state_q, state_q)
         # print(f"loss:{loss/self.batch_size}")
