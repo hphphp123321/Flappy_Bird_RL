@@ -34,8 +34,8 @@ if __name__ == "__main__":
         step = 0
         current_score = 0
         rand = random.randint(5, 20)
-        if epoch % 9999 == 0:
-            agent.lr_rate *= 0.1
+        # if epoch % 9999 == 0:
+        #     agent.lr_rate *= 0.1
         while True:
             # 获得最佳动作
             action = int(agent.get_best_action(state))
@@ -49,9 +49,10 @@ if __name__ == "__main__":
             next_state = agent.get_state(game.getGameState())
             if reward == 1:
                 current_score += 1
-            if reward == 0.1 and step % rand != 0:
-                pass
-            else: agent.add_memory((state, action, reward, next_state, p.game_over()))
+            # if reward == 0.1 and step % rand != 0:
+            #     pass
+            # else: agent.add_memory((state, action, reward, next_state, p.game_over()))
+            agent.add_memory((state, action, reward, next_state, p.game_over()))
             agent.train_model()
             # print(f"score:{p.score()}")
             state = next_state
