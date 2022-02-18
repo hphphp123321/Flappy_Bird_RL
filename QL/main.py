@@ -44,5 +44,5 @@ if __name__ == "__main__":
                 print('Episodes: %s, Current score: %s, Max score: %s' % (episode, current_score, max_score))
                 # 保存q-table
                 if current_score == max_score and max_score > 150:
-                    np.save("{}.npy".format(current_score), agent.q_table)
+                    np.save("./{}.npy".format(current_score), agent.q_table)
                 break
