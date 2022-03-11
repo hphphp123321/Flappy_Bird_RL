@@ -59,6 +59,7 @@ class Agent():
         # return_state[5] = next_next_pipe_dist_to_player
         # return_state[6] = next_next_pipe_top_y
         # return_state[7] = next_next_pipe_bottom_y
+        print(return_state)
         return return_state
 
     def init_netWork(self):
