@@ -16,12 +16,12 @@ class FlappyBirdEnv():
         self.score = 0
         self.max_score = 0
 
-    def step(self, action:int) -> list:
-        state = self.get_state()
-        reward = self.act_get_reward(action=action)
-        next_state = self.get_state()
-        done = self.is_done
-        return state, action, reward, next_state, done
+    # def step(self, action:int) -> list:
+    #     state = self.get_state()
+    #     reward = self.act_get_reward(action=action)
+    #     next_state = self.get_state()
+    #     done = self.is_done
+    #     return state, action, reward, next_state, done
 
     def get_state(self) -> torch.Tensor:
         # return_state = np.zeros((3,))

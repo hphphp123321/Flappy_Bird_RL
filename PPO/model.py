@@ -121,11 +121,11 @@ class ActorCritic(nn.Module):
                  input_dim_actor,
                  num_mlp_layers_actor,
                  hidden_dim_actor,
+                 output_dim_actor,
                  # critic net MLP attributes:
                  input_dim_critic,
                  num_mlp_layers_critic,
                  hidden_dim_critic,
-                 output_dim_actor,
                  output_dim_critic,
                  # actor/critic/ shared attribute
                  device
@@ -198,9 +198,6 @@ class PPO:
                                   device=self.device)
         self.policy_old = deepcopy(self.policy)
 
-        '''self.policy.load_state_dict(
-            torch.load(path='./{}.pth'.format(str(n_j) + '_' + str(n_m) + '_' + str(1) + '_' + str(99))))'''
-
         self.policy_old.load_state_dict(self.policy.state_dict())
         self.optimizer = torch.optim.Adam(self.policy.parameters(), lr=self.lr)
         self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer,
@@ -243,8 +240,6 @@ class PPO:
         rewards = (rewards - rewards.mean()) / (rewards.std() + 1e-5)
         actions = torch.tensor(np.array(memories.actions), dtype=torch.float)
         states = torch.tensor(np.array(memories.states), dtype=torch.float)
-        print(states[0:4])
-        print(actions.shape)
         old_log_probs = torch.tensor(memories.log_probs, dtype=torch.float)
 
         # Optimize policy for K epochs:
